@@ -1,0 +1,347 @@
+package avl_b_tree;
+
+
+public class AVL_B_Tree {
+
+    private class Node{
+        int data;
+        Node left;
+        Node right;
+        int height;
+    
+     Node(int data){
+    this.data=data;
+    this.height=1;
+    }
+     
+  }
+    private Node n_root;
+    
+    public void Insert(int data){
+        this.n_root=Insert_1(this.n_root,data);
+    }
+    
+    private Node Insert_1(Node node, int item){
+        if(node==null){
+            Node new_node=new Node(item);
+            return new_node;
+        }
+        if(item>node.data){
+            node.right=Insert_1(node.right,item);
+         }
+        else if(item<node.data){
+            node.left=Insert_1(node.left,item);
+        }
+        node.height= Math.max(height(node.left), height(node.right))+1;
+        int bal_fact= Balance_Factor(node);
+    
+        //Left_Left case
+         if(bal_fact>1 && item<node.left.data){
+            return Right_Rotate(node);
+        }
+        //Right_Right case
+        
+         else if(bal_fact<-1 && item > node.right.data){
+            return Left_Rotate(node);
+        }
+        
+        //Left_Right case
+        
+         else if(bal_fact>1 && item> node.left.data){
+            node.left= Left_Rotate(node.left);
+            return Right_Rotate(node);
+        }
+        
+        //Right_Left case
+        
+        else if(bal_fact<-1 && item<node.right.data){
+            node.right=Right_Rotate(node.right);
+            return Left_Rotate(node);
+        }
+        
+        return node;
+    }
+    int Max(int a,int b){
+        if(a>b){
+            
+            return a;
+        }
+        else {
+            return b;
+        }
+    }
+    
+     Node min(Node node){
+        /* loop down to find the leftmost leaf */
+    while (node.left != null){
+        node = node.left;
+    }
+    return node;
+}
+    public void Delete(int data){
+        this.n_root=Delete_1(this.n_root,data);
+    }
+    
+    public Node Delete_1(Node node , int item){
+        if(node==null){
+            return node;
+        }
+        else if(item<node.data){
+            node.left=Delete_1(node.left,item);
+        }
+        else if(item<node.data){
+            node.right=Delete_1(node.right,item);
+        }
+        else{
+            // case 1 if there is no child //
+            if(node.left==null && node.right==null){
+                node=null;
+                return node;
+            }
+            // case 2 if there is only one child //
+            else if(node.left==null){
+                Node temp=node;
+                node=node.right;
+                temp=null;
+                return node;
+                }
+            else if(node.right==null){
+                Node temp=node;
+                node=node.left;
+                temp=null;
+                return node;
+                }
+            else{
+                Node temp = min(node.left);
+                node.data=temp.data;
+                node.right=Delete_1(node.right,temp.data);
+            }
+            
+        
+    
+        
+        node.height= Math.max(height(node.left), height(node.right))+1;
+        int bal_fact= Balance_Factor(node);
+    
+        //Left_Left case
+         if(bal_fact>1 && item<node.left.data){
+            return Right_Rotate(node);
+        }
+        //Right_Right case
+        
+         else if(bal_fact<-1 && item > node.right.data){
+            return Left_Rotate(node);
+        }
+        
+        //Left_Right case
+        
+         else if(bal_fact>1 && item> node.left.data){
+            node.left= Left_Rotate(node.left);
+            return Right_Rotate(node);
+        }
+        
+        //Right_Left case
+        
+        else if(bal_fact<-1 && item<node.right.data){
+            node.right=Right_Rotate(node.right);
+            return Left_Rotate(node);
+        }
+        
+    }
+        return node;
+    }
+    public void Find(int data){
+        this.n_root=Find_1(this.n_root, data);
+    }
+    
+    public Node Find_1(Node node, int item){
+    if(node==null){
+        return null;
+    }
+    else if(item<node.data){
+        return this.Find_1(node.left, item);
+    }
+    else if(item>node.data){
+        return this.Find_1(node.right, item);
+    }
+       node.height= Math.max(height(node.left), height(node.right))+1;
+        int bal_fact= Balance_Factor(node);
+    
+        //Left_Left case
+         if(bal_fact>1 && item<node.left.data){
+            return Right_Rotate(node);
+        }
+        //Right_Right case
+        
+         else if(bal_fact<-1 && item > node.right.data){
+            return Left_Rotate(node);
+        }
+        
+        //Left_Right case
+        
+         else if(bal_fact>1 && item> node.left.data){
+            node.left= Left_Rotate(node.left);
+            return Right_Rotate(node);
+        }
+        
+        //Right_Left case
+        
+        else if(bal_fact<-1 && item<node.right.data){
+            node.right=Right_Rotate(node.right);
+            return Left_Rotate(node);
+        }
+         
+        return node;
+        
+    }
+    
+        
+    
+
+
+
+    private int height(Node node){
+        if(node==null){
+            return 0;
+        }
+        return node.height;
+    }
+    private int Balance_Factor(Node n){
+        if(n==null){
+            return 0;
+        }
+        return height(n.left)-height(n.right);
+    }
+    private Node Right_Rotate(Node c_temp){
+        Node b_temp=c_temp.left;
+        Node T3= b_temp.right;
+        
+        //Rotate
+        b_temp.right=c_temp;
+        c_temp.left=T3;
+        
+        //height_update
+        
+        c_temp.height=Math.max(height(c_temp.left),height(c_temp.right))+1;
+        b_temp.height=Math.max(height(b_temp.left),height(b_temp.right))+1;
+        
+        return b_temp;
+    }
+    
+    private Node Left_Rotate(Node c_temp){
+        Node b_temp=c_temp.right;
+        Node T4= b_temp.left;
+        
+        //Rotate
+        b_temp.left=c_temp;
+        c_temp.right=T4;
+        
+        //height_update
+        
+        c_temp.height=Math.max(height(c_temp.left),height(c_temp.right))+1;
+        b_temp.height=Math.max(height(b_temp.left),height(b_temp.right))+1;
+        
+        return b_temp;
+    }
+    
+    public void Pre_Order(){
+        this.n_root=Pre_Order_1(this.n_root);
+    }
+    public Node Pre_Order_1(Node root) {
+		if(root == null) {
+		   return root;
+		}
+		System.out.print(root.data + " ");
+		Pre_Order_1(root.left);
+		Pre_Order_1(root.right);
+                return root;
+	}
+    
+
+    public void In_Order(){
+        this.n_root=In_Order_1(this.n_root);
+    }
+	public Node In_Order_1(Node root) {
+		if(root == null) {
+			return root;
+		}
+                In_Order_1(root.left);
+		System.out.print(root.data + " ");
+		In_Order_1(root.right);
+                return root;
+	}
+        
+        public void Post_Order(){
+        this.n_root=Post_Order_1(this.n_root);
+    }
+
+	public Node Post_Order_1(Node root) {
+		if(root == null) {
+			return root;
+		}
+		Post_Order_1(root.left);
+		Post_Order_1(root.right);
+		System.out.print(root.data + " ");
+                return root;
+	}
+
+
+    
+    public void print(){
+        show(this.n_root);
+    }
+    public void show(Node n){
+        if(n==null){
+            return;
+        }
+        String str ="";
+        if(n.left==null){
+            str+=".";
+        }
+        else{
+            str +=n.left.data;
+        }
+        str += "=>" + n.data + "<=";
+        if(n.right==null){
+            str+=".";
+        }
+        else{
+            str +=n.right.data;
+        }
+        
+        System.out.println(str);
+        show(n.left);
+        show(n.right);
+    }
+    
+    public static void main(String[] args) {
+      AVL_B_Tree t = new AVL_B_Tree();
+      t.Insert(50);
+      t.Insert(20);
+      t.Insert(30);
+        System.out.println("Tree");
+      t.print();
+        System.out.println("");
+        System.out.println("In Order");
+      t.In_Order();
+        System.out.println("");
+      System.out.println("Pre Order");
+      t.Pre_Order();
+        System.out.println("");
+      System.out.println("Post Order");
+      t.Post_Order();
+        System.out.println("");
+      t.Delete(20);
+      System.out.println("");
+        System.out.println("After Node Deletion");
+      t.print();
+        System.out.println("");
+        System.out.println("Node Search");
+      t.Find(50);
+      t.print();
+      
+    }
+    
+}
+
+
